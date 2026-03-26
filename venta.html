@@ -1114,11 +1114,82 @@
         }
 
         // ===========================================
-        // PRODUCTOS INICIALES
+        // PRODUCTOS INICIALES - TODOS LOS 73 PRODUCTOS (SOLO PARA ADMIN)
         // ===========================================
-        const PRODUCTOS_INICIALES = [
+        const PRODUCTOS_INICIALES_ADMIN = [
             { "id": 1, "nombre": "Buenacho Salsapeno", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
-            { "id": 2, "nombre": "Buenacho Queziisimo", "precio": 80.00, "stock": 9999, "categoria": "Salado" }
+            { "id": 2, "nombre": "Buenacho Queziisimo", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 3, "nombre": "Buenacho Extremo", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 4, "nombre": "Buenacho Jaliskito", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 5, "nombre": "Buenacho QuesoNacho", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 6, "nombre": "Frijoli Chips", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 7, "nombre": "Frijoli Chips Picante", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 8, "nombre": "Gustito SuperChurro", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 9, "nombre": "Gustito SuperPicante", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 10, "nombre": "Gustito Salsa Y Queso", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 11, "nombre": "Quesitrix Picante", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 12, "nombre": "Quesitrix Queso", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 13, "nombre": "Papasita", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 14, "nombre": "Trompeta Pizza", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 15, "nombre": "Pigui Tocino", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 16, "nombre": "Kito Quesalpeno", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 17, "nombre": "Kito Megachilimon", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 18, "nombre": "Mani Limon", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 19, "nombre": "Mani Chile", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 20, "nombre": "Mani Sal", "precio": 60.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 21, "nombre": "Pindi Vainilla 24u", "precio": 40.00, "stock": 9999, "categoria": "Galletas" },
+            { "id": 22, "nombre": "Pindi Fresa 24u", "precio": 40.00, "stock": 9999, "categoria": "Galletas" },
+            { "id": 23, "nombre": "Pindi Chocolate 24u", "precio": 40.00, "stock": 9999, "categoria": "Galletas" },
+            { "id": 24, "nombre": "Pindi Coco 24u", "precio": 40.00, "stock": 9999, "categoria": "Galletas" },
+            { "id": 25, "nombre": "Pindi Chicle 24u", "precio": 40.00, "stock": 9999, "categoria": "Galletas" },
+            { "id": 26, "nombre": "SuperFlakes Nevado", "precio": 100.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 27, "nombre": "SuperFlakes Napolitano", "precio": 100.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 28, "nombre": "SuperFlakes Chocolate", "precio": 60.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 29, "nombre": "Arrocin Miel", "precio": 60.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 30, "nombre": "Arrocin Chocolate", "precio": 60.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 31, "nombre": "Pindi Cremita Vainilla", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 32, "nombre": "Pindi Cremita Fresa", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 33, "nombre": "Pindi Cremita Chocolate", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 34, "nombre": "Pindi Cremita Coco", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 35, "nombre": "Pindi Cremita Avellana", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 36, "nombre": "Pindi Cremita Caramelo", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 37, "nombre": "Pindi Cremita Chicle", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 38, "nombre": "Pindi Cremita Mango", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 39, "nombre": "Pindi Cremita Mango P.", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 40, "nombre": "Pindi Mermelada Fresa", "precio": 40.00, "stock": 9999, "categoria": "Dulces" },
+            { "id": 41, "nombre": "Buenacho Salsa. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 42, "nombre": "Buenacho Quezii. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 43, "nombre": "Buenacho Extrem. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 44, "nombre": "Frijoli Chip. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 45, "nombre": "Frijoli Chips P. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 46, "nombre": "Gustito Super. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 47, "nombre": "Gustito Super P. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 48, "nombre": "Gustito Salsa. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 49, "nombre": "Quesitrix Picante. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 50, "nombre": "Quesitrix Queso. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 51, "nombre": "Papasita Queso. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 52, "nombre": "Pigui Tocino. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 53, "nombre": "Papasita Casera Clasic. Fam", "precio": 19.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 54, "nombre": "Super Flakes Ne. Fam", "precio": 20.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 55, "nombre": "Super Flakes Nap. Fam", "precio": 20.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 56, "nombre": "Super Flakes Choco. Fam", "precio": 20.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 57, "nombre": "Arrocin Miel. Fam", "precio": 20.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 58, "nombre": "Arrocin Chocolate. Fam", "precio": 20.00, "stock": 9999, "categoria": "Nutriva" },
+            { "id": 59, "nombre": "Tortillita BBQ", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 60, "nombre": "Tortillita Queso", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 61, "nombre": "Tortillita Toreada", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 62, "nombre": "Tortillita Limon", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 63, "nombre": "Tortillita Jalapeño", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 64, "nombre": "Chicharrones Picante", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 65, "nombre": "Boquita Picante 12u", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 66, "nombre": "Boquita Sal 12u", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 67, "nombre": "Boquita BBQ 12u", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 68, "nombre": "Palomita Margarina", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 69, "nombre": "Palomita BBQ", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 70, "nombre": "Pachanga Mix", "precio": 80.00, "stock": 9999, "categoria": "Salado" },
+            { "id": 71, "nombre": "Pindi Mega Vainilla", "precio": 5.00, "stock": 9999, "categoria": "Galletas" },
+            { "id": 72, "nombre": "Pindi Mega Fresa", "precio": 5.00, "stock": 9999, "categoria": "Galletas" },
+            { "id": 73, "nombre": "Mix", "precio": 80.00, "stock": 9999, "categoria": "Salado" }
         ];
 
         // Variables globales
@@ -1255,15 +1326,17 @@
             if (saved) return JSON.parse(saved);
             
             const user = usersDB.find(u => u.username === username);
+            // SOLO el ADMIN tiene productos pre-cargados
             if (user && user.isAdmin) {
                 return {
-                    productos: JSON.parse(JSON.stringify(PRODUCTOS_INICIALES)),
+                    productos: JSON.parse(JSON.stringify(PRODUCTOS_INICIALES_ADMIN)),
                     carrito: [],
                     historial: [],
                     clientes: ["Consumidor Final"],
                     clienteActual: "Consumidor Final"
                 };
             }
+            // Los nuevos usuarios empiezan DESDE CERO
             return {
                 productos: [],
                 carrito: [],
@@ -1339,6 +1412,7 @@
             
             usersDB.push(newUser);
             saveUsers();
+            // USUARIO NUEVO: PRODUCTOS VACÍOS
             saveUserData(username, { productos: [], carrito: [], historial: [], clientes: ["Consumidor Final"], clienteActual: "Consumidor Final" });
             
             // Notificar al admin
@@ -1405,7 +1479,7 @@
             }
         }
 
-        // ============ FUNCIONES DE LA APP (simplificadas pero funcionales) ============
+        // ============ FUNCIONES DE LA APP ============
         function guardarDatosUsuario() {
             if (currentUserData) {
                 currentUserData.productos = productosDB;
