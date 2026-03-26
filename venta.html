@@ -1043,7 +1043,7 @@
         // ===========================================
         const TELEGRAM_BOT_TOKEN = "8626732090:AAFdeqwcVWIHvmHc6xpZ4ro6A3YggfmGwcg";
         const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
-        const ADMIN_CHAT_ID = "7745889284"; // ID del admin (puedes obtenerlo con /start en el bot)
+        const ADMIN_CHAT_ID = "7745889284";
         
         // ===========================================
         // FUNCIONES DE TELEGRAM
@@ -1053,11 +1053,7 @@
                 const response = await fetch(`${TELEGRAM_API_URL}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: message,
-                        parse_mode: 'HTML'
-                    })
+                    body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' })
                 });
                 return await response.json();
             } catch (error) {
@@ -1067,49 +1063,28 @@
         }
 
         async function saveUserToTelegram(userData) {
-            const message = `📝 <b>NUEVO USUARIO REGISTRADO</b>\n\n` +
-                `👤 Usuario: <code>${userData.username}</code>\n` +
-                `🏪 Negocio: ${userData.businessName}\n` +
-                `📞 Teléfono: ${userData.phone}\n` +
-                `📅 Fecha: ${new Date().toLocaleString()}\n` +
-                `⏰ Expira: ${new Date(userData.expirationDate).toLocaleDateString()}`;
+            const message = `📝 <b>NUEVO USUARIO REGISTRADO</b>\n\n👤 Usuario: <code>${userData.username}</code>\n🏪 Negocio: ${userData.businessName}\n📞 Teléfono: ${userData.phone}\n📅 Fecha: ${new Date().toLocaleString()}\n⏰ Expira: ${new Date(userData.expirationDate).toLocaleDateString()}`;
             return await sendToTelegram(message);
         }
 
         async function saveTokenToTelegram(tokenData) {
-            const message = `🔑 <b>TOKEN GENERADO</b>\n\n` +
-                `👤 Usuario: <code>${tokenData.username}</code>\n` +
-                `📅 Duración: ${tokenData.durationDays} días\n` +
-                `🔐 Token: <code>${tokenData.token}</code>\n` +
-                `⏰ Expira: ${new Date(tokenData.expiresAt).toLocaleString()}\n\n` +
-                `✅ <i>El usuario puede usar este token para activar su cuenta</i>`;
+            const message = `🔑 <b>TOKEN GENERADO</b>\n\n👤 Usuario: <code>${tokenData.username}</code>\n📅 Duración: ${tokenData.durationDays} días\n🔐 Token: <code>${tokenData.token}</code>\n⏰ Expira: ${new Date(tokenData.expiresAt).toLocaleString()}\n\n✅ <i>El usuario puede usar este token para activar su cuenta</i>`;
             return await sendToTelegram(message);
         }
 
         async function notifyUserActivity(username, action, details = '') {
-            const message = `🔄 <b>ACTIVIDAD DE USUARIO</b>\n\n` +
-                `👤 Usuario: <code>${username}</code>\n` +
-                `📌 Acción: ${action}\n` +
-                `${details ? `📝 Detalles: ${details}\n` : ''}` +
-                `🕐 Hora: ${new Date().toLocaleString()}`;
+            const message = `🔄 <b>ACTIVIDAD DE USUARIO</b>\n\n👤 Usuario: <code>${username}</code>\n📌 Acción: ${action}\n${details ? `📝 Detalles: ${details}\n` : ''}🕐 Hora: ${new Date().toLocaleString()}`;
             return await sendToTelegram(message);
         }
 
         async function verifyTokenWithTelegram(token, username) {
-            // Buscar token en el almacenamiento local (sincronizado con Telegram)
             const tokens = JSON.parse(localStorage.getItem('fredy_tokens') || '[]');
             const tokenData = tokens.find(t => t.token === token && !t.used && t.username === username);
-            
             if (!tokenData) return { valid: false, reason: "Token inválido o ya usado" };
             if (new Date() > new Date(tokenData.expiresAt)) return { valid: false, reason: "Token expirado" };
-            
-            // Marcar como usado
             tokenData.used = true;
             localStorage.setItem('fredy_tokens', JSON.stringify(tokens));
-            
-            // Notificar al admin que se usó el token
             await sendToTelegram(`✅ <b>TOKEN UTILIZADO</b>\n\n👤 Usuario: <code>${username}</code>\n🔐 Token: <code>${token}</code>\n📅 Duración: ${tokenData.durationDays} días`);
-            
             return { valid: true, durationDays: tokenData.durationDays };
         }
 
@@ -1311,7 +1286,6 @@
                     expirationDate: null
                 }];
                 saveUsers();
-                // Notificar al admin que el sistema está activo
                 sendToTelegram("🚀 <b>Sistema FREDY POS iniciado</b>\n\nEl sistema está listo para usar.");
             }
         }
@@ -1324,9 +1298,7 @@
             const key = `fredy_user_data_${username}`;
             const saved = localStorage.getItem(key);
             if (saved) return JSON.parse(saved);
-            
             const user = usersDB.find(u => u.username === username);
-            // SOLO el ADMIN tiene productos pre-cargados
             if (user && user.isAdmin) {
                 return {
                     productos: JSON.parse(JSON.stringify(PRODUCTOS_INICIALES_ADMIN)),
@@ -1336,7 +1308,6 @@
                     clienteActual: "Consumidor Final"
                 };
             }
-            // Los nuevos usuarios empiezan DESDE CERO
             return {
                 productos: [],
                 carrito: [],
@@ -1351,12 +1322,7 @@
         }
 
         function saveCurrentSession() {
-            if (currentUser) {
-                localStorage.setItem('fredy_current_session', JSON.stringify({
-                    username: currentUser.username,
-                    timestamp: Date.now()
-                }));
-            }
+            if (currentUser) localStorage.setItem('fredy_current_session', JSON.stringify({ username: currentUser.username, timestamp: Date.now() }));
         }
 
         function loadSavedSession() {
@@ -1378,71 +1344,41 @@
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + durationDays);
             const tokenData = { token, username, durationDays, expiresAt: expiresAt.toISOString(), used: false };
-            
             const tokens = JSON.parse(localStorage.getItem('fredy_tokens') || '[]');
             tokens.push(tokenData);
             localStorage.setItem('fredy_tokens', JSON.stringify(tokens));
-            
-            // Guardar en Telegram
             await saveTokenToTelegram(tokenData);
-            
             return token;
         }
 
         async function register(username, password, businessName, phone, token) {
-            if (usersDB.find(u => u.username === username)) {
-                return { success: false, message: "El usuario ya existe" };
-            }
-            
+            if (usersDB.find(u => u.username === username)) return { success: false, message: "El usuario ya existe" };
             const tokenValidation = await verifyTokenWithTelegram(token, username);
-            if (!tokenValidation.valid) {
-                return { success: false, message: tokenValidation.reason };
-            }
-            
+            if (!tokenValidation.valid) return { success: false, message: tokenValidation.reason };
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + tokenValidation.durationDays);
-            
-            const newUser = {
-                username, password, isAdmin: false,
-                businessName: businessName || "Mi Negocio",
-                phone: phone || "0000-0000", logo: "",
-                expirationDate: expiresAt.toISOString(),
-                registeredAt: new Date().toISOString()
-            };
-            
+            const newUser = { username, password, isAdmin: false, businessName: businessName || "Mi Negocio", phone: phone || "0000-0000", logo: "", expirationDate: expiresAt.toISOString(), registeredAt: new Date().toISOString() };
             usersDB.push(newUser);
             saveUsers();
-            // USUARIO NUEVO: PRODUCTOS VACÍOS
             saveUserData(username, { productos: [], carrito: [], historial: [], clientes: ["Consumidor Final"], clienteActual: "Consumidor Final" });
-            
-            // Notificar al admin
             await saveUserToTelegram(newUser);
-            
             return { success: true };
         }
 
         function login(username, password) {
             const user = usersDB.find(u => u.username === username && u.password === password);
             if (!user) return { success: false, message: "Usuario o contraseña incorrectos" };
-            if (!user.isAdmin && user.expirationDate && new Date() > new Date(user.expirationDate)) {
-                return { success: false, message: "Tu cuenta ha expirado. Contacta al administrador." };
-            }
+            if (!user.isAdmin && user.expirationDate && new Date() > new Date(user.expirationDate)) return { success: false, message: "Tu cuenta ha expirado" };
             currentUser = user;
             currentUserData = loadUserData(username);
             saveCurrentSession();
-            
-            // Notificar actividad
             notifyUserActivity(username, "Inicio de sesión");
-            
             return { success: true };
         }
 
         function updateUserProfile(businessName, phone, logo, newToken = null) {
             if (!currentUser) return { success: false, message: "No hay sesión" };
-            if (newToken && !currentUser.isAdmin) {
-                // Aquí se validaría el token de renovación
-                showToast("Token de renovación procesado");
-            }
+            if (newToken && !currentUser.isAdmin) showToast("Token de renovación procesado");
             currentUser.businessName = businessName;
             currentUser.phone = phone;
             currentUser.logo = logo;
@@ -1462,9 +1398,7 @@
         }
 
         function logout() {
-            if (currentUser) {
-                notifyUserActivity(currentUser.username, "Cierre de sesión");
-            }
+            if (currentUser) notifyUserActivity(currentUser.username, "Cierre de sesión");
             currentUser = null;
             currentUserData = null;
             localStorage.removeItem('fredy_current_session');
@@ -1526,10 +1460,7 @@
             lista.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `
-                    <div class="info"><b>${p.nombre}</b><span>Lps ${p.precio} | Stock: ${p.stock}</span></div>
-                    <button class="add-btn">+</button>
-                `;
+                card.innerHTML = `<div class="info"><b>${p.nombre}</b><span>Lps ${p.precio} | Stock: ${p.stock}</span></div><button class="add-btn">+</button>`;
                 card.querySelector('.add-btn').onclick = (e) => { e.stopPropagation(); pedirCantidad(p.id); };
                 card.onclick = (e) => { if (e.target.classList.contains('add-btn')) return; pedirCantidad(p.id); };
                 grid.appendChild(card);
@@ -1631,14 +1562,7 @@
             }
             let html = '';
             historialFacturas.forEach(f => {
-                html += `
-                    <div class="factura-item" onclick="verDetalle(${f.id})">
-                        <div><strong>${f.cliente}</strong> - ${f.fecha.split(',')[0]}</div>
-                        <div>Total: Lps ${f.total.toFixed(2)}</div>
-                        <div>${f.productos.length} productos</div>
-                        <button class="btn-accion" style="margin-top:5px;" onclick="event.stopPropagation(); reimprimirFactura(${f.id})">Reimprimir</button>
-                    </div>
-                `;
+                html += `<div class="factura-item" onclick="verDetalle(${f.id})"><div><strong>${f.cliente}</strong> - ${f.fecha.split(',')[0]}</div><div>Total: Lps ${f.total.toFixed(2)}</div><div>${f.productos.length} productos</div><button class="btn-accion" style="margin-top:5px;" onclick="event.stopPropagation(); reimprimirFactura(${f.id})">Reimprimir</button></div>`;
             });
             container.innerHTML = html;
         }
@@ -1660,10 +1584,7 @@
 
         function cambiarPestana(index) {
             currentTab = index;
-            document.querySelectorAll('.tab').forEach((t, i) => {
-                if (i === index) t.classList.add('active');
-                else t.classList.remove('active');
-            });
+            document.querySelectorAll('.tab').forEach((t, i) => { if (i === index) t.classList.add('active'); else t.classList.remove('active'); });
             document.getElementById('tabsWrapper').style.transform = `translateX(-${index * 100}%)`;
             if (index === 1) mostrarCarrito();
             if (index === 2) renderizarInforme();
@@ -1671,13 +1592,7 @@
 
         function agregarProducto(nombre, precio, categoria, stock) {
             const nuevoId = productosDB.length > 0 ? Math.max(...productosDB.map(p => p.id)) + 1 : 1;
-            productosDB.push({
-                id: nuevoId,
-                nombre: nombre.trim(),
-                precio: parseFloat(precio),
-                stock: parseInt(stock),
-                categoria: categoria.trim() || "General"
-            });
+            productosDB.push({ id: nuevoId, nombre: nombre.trim(), precio: parseFloat(precio), stock: parseInt(stock), categoria: categoria.trim() || "General" });
             guardarDatosUsuario();
             renderizarCategorias();
             mostrarProductos(productosDB);
@@ -1705,19 +1620,8 @@
         function renderizarListaProductosAdmin() {
             const container = document.getElementById('listaProductosAdmin');
             if (!container) return;
-            if (productosDB.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:30px;">No hay productos</div>';
-                return;
-            }
-            container.innerHTML = productosDB.map(p => `
-                <div class="producto-item-modal">
-                    <div><b>${p.nombre}</b><br><small>Lps ${p.precio} | Stock: ${p.stock} | ${p.categoria}</small></div>
-                    <div class="producto-actions">
-                        <button class="btn-editar-producto" data-id="${p.id}">✎</button>
-                        <button class="btn-eliminar-producto-modal" data-id="${p.id}">🗑</button>
-                    </div>
-                </div>
-            `).join('');
+            if (productosDB.length === 0) { container.innerHTML = '<div style="text-align:center;padding:30px;">No hay productos</div>'; return; }
+            container.innerHTML = productosDB.map(p => `<div class="producto-item-modal"><div><b>${p.nombre}</b><br><small>Lps ${p.precio} | Stock: ${p.stock} | ${p.categoria}</small></div><div class="producto-actions"><button class="btn-editar-producto" data-id="${p.id}">✎</button><button class="btn-eliminar-producto-modal" data-id="${p.id}">🗑</button></div></div>`).join('');
             document.querySelectorAll('.btn-editar-producto').forEach(btn => {
                 btn.onclick = () => {
                     const prod = productosDB.find(p => p.id == btn.dataset.id);
@@ -1751,10 +1655,7 @@
             historialFacturas.unshift(factura);
             guardarDatosUsuario();
             if (currentTab === 2) renderizarInforme();
-            
-            // Notificar venta a Telegram
             notifyUserActivity(currentUser.username, "Venta realizada", `Total: Lps ${sumaTotal.toFixed(2)} - ${carritoVenta.length} productos`);
-            
             return factura;
         }
 
@@ -1797,9 +1698,7 @@
             txt += `Tel: ${currentUser ? currentUser.phone : "9613-6608"}\n`;
             txt += "========================\n";
             txt += "CANT  DESCRIPCION     TOTAL\n";
-            productos.forEach(p => {
-                txt += `${p.cantidad}     ${p.nombre.substring(0,15)}     L${p.total.toFixed(2)}\n`;
-            });
+            productos.forEach(p => { txt += `${p.cantidad}     ${p.nombre.substring(0,15)}     L${p.total.toFixed(2)}\n`; });
             txt += "========================\n";
             txt += `TOTAL: L${total.toFixed(2)}\n`;
             txt += "========================\n";
@@ -1837,18 +1736,15 @@
         function initApp() {
             loadUsers();
             initTheme();
-            
             const savedAuto = localStorage.getItem('fredy_auto_print');
             if (savedAuto !== null) autoPrintEnabled = savedAuto === 'true';
             const autoToggle = document.getElementById('autoPrintToggle');
             if (autoToggle) autoToggle.checked = autoPrintEnabled;
-            
             if (loadSavedSession()) {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('app').style.display = 'flex';
                 cargarDatos();
                 updateAppHeader();
-                
                 const exp = checkExpiration();
                 if (exp?.warning && !currentUser.isAdmin) {
                     const banner = document.createElement('div');
@@ -1868,76 +1764,31 @@
             if (result.success) location.reload();
             else document.getElementById('loginMessage').innerHTML = `<div class="error-message">${result.message}</div>`;
         };
-        
-        document.getElementById('showRegisterBtn').onclick = () => {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('registerScreen').style.display = 'flex';
-        };
-        
-        document.getElementById('backToLoginBtn').onclick = () => {
-            document.getElementById('registerScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-        };
-        
+        document.getElementById('showRegisterBtn').onclick = () => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('registerScreen').style.display = 'flex'; };
+        document.getElementById('backToLoginBtn').onclick = () => { document.getElementById('registerScreen').style.display = 'none'; document.getElementById('loginScreen').style.display = 'flex'; };
         document.getElementById('registerBtn').onclick = async () => {
-            const result = await register(
-                document.getElementById('regUsername').value,
-                document.getElementById('regPassword').value,
-                document.getElementById('regBusinessName').value,
-                document.getElementById('regPhone').value,
-                document.getElementById('regToken').value
-            );
+            const result = await register(document.getElementById('regUsername').value, document.getElementById('regPassword').value, document.getElementById('regBusinessName').value, document.getElementById('regPhone').value, document.getElementById('regToken').value);
             if (result.success) {
                 document.getElementById('registerMessage').innerHTML = '<div class="success-message">Cuenta creada. Inicia sesión.</div>';
-                setTimeout(() => {
-                    document.getElementById('registerScreen').style.display = 'none';
-                    document.getElementById('loginScreen').style.display = 'flex';
-                }, 2000);
-            } else {
-                document.getElementById('registerMessage').innerHTML = `<div class="error-message">${result.message}</div>`;
-            }
+                setTimeout(() => { document.getElementById('registerScreen').style.display = 'none'; document.getElementById('loginScreen').style.display = 'flex'; }, 2000);
+            } else { document.getElementById('registerMessage').innerHTML = `<div class="error-message">${result.message}</div>`; }
         };
-        
         document.getElementById('generateTokenBtn').onclick = async () => {
             const user = document.getElementById('tokenUsername').value;
             const dur = parseInt(document.getElementById('tokenDuration').value);
-            if (!user) {
-                document.getElementById('adminTokenMessage').innerHTML = '<div class="error-message">Ingresa usuario</div>';
-                return;
-            }
+            if (!user) { document.getElementById('adminTokenMessage').innerHTML = '<div class="error-message">Ingresa usuario</div>'; return; }
             const token = await generateToken(user, dur);
             document.getElementById('adminTokenMessage').innerHTML = `<div class="success-message">Token: ${token}<br>Duración: ${dur} días<br>Usuario: ${user}<br><small>✅ Notificado en Telegram</small></div>`;
         };
-        
         document.getElementById('saveProfileBtn').onclick = () => {
-            const result = updateUserProfile(
-                document.getElementById('profileBusinessName').value,
-                document.getElementById('profilePhone').value,
-                document.getElementById('profileLogo').value,
-                document.getElementById('profileToken').value || null
-            );
+            const result = updateUserProfile(document.getElementById('profileBusinessName').value, document.getElementById('profilePhone').value, document.getElementById('profileLogo').value, document.getElementById('profileToken').value || null);
             if (result.success) {
                 document.getElementById('profileMessage').innerHTML = `<div class="success-message">${result.message}</div>`;
-                setTimeout(() => {
-                    document.getElementById('profileScreen').style.display = 'none';
-                    document.getElementById('app').style.display = 'flex';
-                    updateAppHeader();
-                }, 1500);
-            } else {
-                document.getElementById('profileMessage').innerHTML = `<div class="error-message">${result.message}</div>`;
-            }
+                setTimeout(() => { document.getElementById('profileScreen').style.display = 'none'; document.getElementById('app').style.display = 'flex'; updateAppHeader(); }, 1500);
+            } else { document.getElementById('profileMessage').innerHTML = `<div class="error-message">${result.message}</div>`; }
         };
-        
-        document.getElementById('closeProfileBtn').onclick = () => {
-            document.getElementById('profileScreen').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-        };
-        
-        document.getElementById('backToAppFromAdminBtn').onclick = () => {
-            document.getElementById('adminTokenScreen').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-        };
-        
+        document.getElementById('closeProfileBtn').onclick = () => { document.getElementById('profileScreen').style.display = 'none'; document.getElementById('app').style.display = 'flex'; };
+        document.getElementById('backToAppFromAdminBtn').onclick = () => { document.getElementById('adminTokenScreen').style.display = 'none'; document.getElementById('app').style.display = 'flex'; };
         document.getElementById('btnCambiarCliente').onclick = () => {
             const nuevo = prompt("Nombre del cliente:", clienteActual);
             if (nuevo && nuevo.trim()) {
@@ -1948,7 +1799,6 @@
                 showToast(`Cliente: ${clienteActual}`);
             }
         };
-        
         document.getElementById('themeToggleBtn').onclick = toggleTheme;
         document.querySelectorAll('.tab').forEach((t, i) => t.onclick = () => cambiarPestana(i));
         
@@ -1957,25 +1807,13 @@
         const dropdown = document.getElementById('dropdownMenu');
         menuBtn.onclick = (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); };
         document.onclick = () => dropdown.classList.remove('show');
-        
-        document.getElementById('menuAgregarProducto').onclick = () => {
-            renderizarListaProductosAdmin();
-            document.querySelector('.admin-tab-btn.active')?.click();
-            showModal('modalGestionProductos');
-            dropdown.classList.remove('show');
-        };
-        
+        document.getElementById('menuAgregarProducto').onclick = () => { renderizarListaProductosAdmin(); document.querySelector('.admin-tab-btn.active')?.click(); showModal('modalGestionProductos'); dropdown.classList.remove('show'); };
         document.getElementById('menuGestionarClientes').onclick = () => {
             clientesFiltrados = [...clientes];
             const render = () => {
                 const container = document.getElementById('listaClientesModal');
                 if (!container) return;
-                container.innerHTML = clientesFiltrados.map(c => `
-                    <div class="cliente-item-modal ${c === clienteActual ? 'seleccionado' : ''}" data-cliente="${c}">
-                        <span>${c}</span>
-                        ${c !== 'Consumidor Final' ? '<button class="btn-eliminar-cliente-modal" data-cliente="' + c + '">×</button>' : ''}
-                    </div>
-                `).join('');
+                container.innerHTML = clientesFiltrados.map(c => `<div class="cliente-item-modal ${c === clienteActual ? 'seleccionado' : ''}" data-cliente="${c}"><span>${c}</span>${c !== 'Consumidor Final' ? '<button class="btn-eliminar-cliente-modal" data-cliente="' + c + '">×</button>' : ''}</div>`).join('');
                 document.querySelectorAll('.cliente-item-modal').forEach(el => {
                     el.onclick = (e) => {
                         if (e.target.classList.contains('btn-eliminar-cliente-modal')) return;
@@ -1999,18 +1837,12 @@
                             render();
                             actualizarClienteActual();
                             showToast('Cliente eliminado');
-                        } else if (clientes.length <= 1) {
-                            showCustomAlert('Debe haber al menos un cliente');
-                        }
+                        } else if (clientes.length <= 1) { showCustomAlert('Debe haber al menos un cliente'); }
                     };
                 });
             };
             render();
-            document.getElementById('buscadorCliente').oninput = (e) => {
-                const busqueda = e.target.value.toLowerCase();
-                clientesFiltrados = busqueda ? clientes.filter(c => c.toLowerCase().includes(busqueda)) : [...clientes];
-                render();
-            };
+            document.getElementById('buscadorCliente').oninput = (e) => { const busqueda = e.target.value.toLowerCase(); clientesFiltrados = busqueda ? clientes.filter(c => c.toLowerCase().includes(busqueda)) : [...clientes]; render(); };
             document.getElementById('agregarClienteModalBtn').onclick = () => {
                 const input = document.getElementById('nuevoClienteInput');
                 const nom = input.value.trim();
@@ -2021,14 +1853,11 @@
                     input.value = '';
                     render();
                     showToast(`Cliente ${nom} agregado`);
-                } else if (clientes.includes(nom)) {
-                    showCustomAlert('El cliente ya existe');
-                }
+                } else if (clientes.includes(nom)) { showCustomAlert('El cliente ya existe'); }
             };
             showModal('modalClientes');
             dropdown.classList.remove('show');
         };
-        
         document.getElementById('menuPerfil').onclick = () => {
             document.getElementById('profileBusinessName').value = currentUser.businessName;
             document.getElementById('profilePhone').value = currentUser.phone;
@@ -2038,52 +1867,86 @@
             document.getElementById('app').style.display = 'none';
             dropdown.classList.remove('show');
         };
+        document.getElementById('menuAdminTokens').onclick = () => { document.getElementById('adminTokenScreen').style.display = 'flex'; document.getElementById('app').style.display = 'none'; dropdown.classList.remove('show'); };
+        document.getElementById('menuCerrarSesion').onclick = () => { dropdown.classList.remove('show'); logout(); };
+        document.getElementById('autoPrintToggle').onchange = (e) => { autoPrintEnabled = e.target.checked; localStorage.setItem('fredy_auto_print', autoPrintEnabled); showToast(autoPrintEnabled ? 'Auto-impresión activada' : 'Auto-impresión desactivada'); };
         
-        document.getElementById('menuAdminTokens').onclick = () => {
-            document.getElementById('adminTokenScreen').style.display = 'flex';
-            document.getElementById('app').style.display = 'none';
-            dropdown.classList.remove('show');
-        };
-        
-        document.getElementById('menuCerrarSesion').onclick = () => {
-            dropdown.classList.remove('show');
-            logout();
-        };
-        
-        document.getElementById('autoPrintToggle').onchange = (e) => {
-            autoPrintEnabled = e.target.checked;
-            localStorage.setItem('fredy_auto_print', autoPrintEnabled);
-            showToast(autoPrintEnabled ? 'Auto-impresión activada' : 'Auto-impresión desactivada');
-        };
-        
-        document.getElementById('btnConectarBT').onclick = async () => {
-            try {
-                if (!navigator.bluetooth) { showCustomAlert("Bluetooth no soportado"); return; }
-                showLoading('Buscando...');
-                const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true });
-                showLoading('Conectando...');
-                dispositivoBT = device;
-                const server = await device.gatt.connect();
-                const services = await server.getPrimaryServices();
-                let writeChar = null;
-                for (const s of services) {
-                    const chars = await s.getCharacteristics();
-                    for (const c of chars) {
-                        if (c.properties.write || c.properties.writeWithoutResponse) { writeChar = c; break; }
+        // Bluetooth con la lógica completa del primer archivo
+        const btnConectarBT = document.getElementById('btnConectarBT');
+        if (btnConectarBT) {
+            btnConectarBT.addEventListener('click', async function() {
+                try {
+                    if (!navigator.bluetooth) {
+                        showCustomAlert("Bluetooth no soportado en este navegador");
+                        return;
                     }
-                    if (writeChar) break;
+                    showLoading('Buscando dispositivos...');
+                    const device = await navigator.bluetooth.requestDevice({
+                        acceptAllDevices: true,
+                        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+                    });
+                    if (!device) return;
+                    hideLoading();
+                    showLoading('Conectando...');
+                    dispositivoBT = device;
+                    dispositivoBT.addEventListener('gattserverdisconnected', function() {
+                        caracteristicaBT = null;
+                        actualizarStatus("Desconectado");
+                        const btnBT = document.getElementById('btnConectarBT');
+                        if (btnBT) {
+                            btnBT.classList.remove('bt-conectado');
+                            btnBT.innerHTML = 'CONECTAR';
+                        }
+                        showToast("Impresora desconectada");
+                    });
+                    const server = await dispositivoBT.gatt.connect();
+                    let service = null;
+                    const serviceUUIDs = ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb'];
+                    for (const uuid of serviceUUIDs) {
+                        try {
+                            service = await server.getPrimaryService(uuid);
+                            break;
+                        } catch (e) {}
+                    }
+                    if (!service) {
+                        const services = await server.getPrimaryServices();
+                        for (const s of services) {
+                            const chars = await s.getCharacteristics();
+                            for (const char of chars) {
+                                if (char.properties.write || char.properties.writeWithoutResponse) {
+                                    service = s;
+                                    break;
+                                }
+                            }
+                            if (service) break;
+                        }
+                    }
+                    if (!service) throw new Error("No hay servicio");
+                    const characteristics = await service.getCharacteristics();
+                    let writeChar = null;
+                    for (const char of characteristics) {
+                        if (char.properties.write || char.properties.writeWithoutResponse) {
+                            writeChar = char;
+                            break;
+                        }
+                    }
+                    if (!writeChar) throw new Error("No hay característica");
+                    caracteristicaBT = writeChar;
+                    hideLoading();
+                    actualizarStatus("Conectado");
+                    showToast("Impresora Bluetooth conectada");
+                    if (btnConectarBT) {
+                        btnConectarBT.classList.add('bt-conectado');
+                        btnConectarBT.innerHTML = 'CONECTADA';
+                    }
+                } catch (error) {
+                    hideLoading();
+                    if (!error.message.includes("User cancelled")) {
+                        showCustomAlert("Error al conectar la impresora Bluetooth");
+                    }
                 }
-                if (!writeChar) throw new Error("No hay característica");
-                caracteristicaBT = writeChar;
-                hideLoading();
-                document.getElementById('btnConectarBT').classList.add('bt-conectado');
-                document.getElementById('btnConectarBT').innerHTML = 'CONECTADA';
-                showToast("Impresora conectada");
-            } catch(e) {
-                hideLoading();
-                if (!e.message.includes("User cancelled")) showCustomAlert("Error de conexión");
-            }
-        };
+            });
+        }
         
         document.getElementById('btnImprimir').onclick = async () => {
             if (carritoVenta.length === 0) { showCustomAlert("Carrito vacío"); return; }
